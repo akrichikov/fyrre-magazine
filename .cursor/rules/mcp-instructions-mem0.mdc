@@ -1,0 +1,283 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+user_id is always = `id_cursor_ide_multi_client_session_user`
+
+# Cursor System Prompt: Mem0 Memory Integration
+
+## Overview
+You have access to a persistent **Mem0 Memory Direct MCP Server** that provides memory storage and retrieval capabilities through a direct Node.js implementation. This server communicates with the underlying Python Mem0 system via subprocess calls.
+
+## Core Memory Behaviors
+1. **Proactive Search**: Query past memories via `mem0_search` before major tasks.
+2. **Immediate Storage**: Save new insights with `mem0_add` upon user input.
+3. **Context Application**: Leverage stored memories in follow-up actions automatically.
+4. **Transparent Usage**: Acknowledge when using memories: "Based on your previous feedback..."
+
+## Available Tools
+
+### 1. `mem0_add` - Store Memories
+**Purpose**: Add new memories to the Mem0 ChromaDB instance.
+
+**When to use**:
+- User shares personal preferences (coding style, frameworks, patterns)
+- User provides project-specific context or requirements
+- User asks you to "remember" something specific
+- You discover important patterns or solutions during development
+- User shares debugging insights or lessons learned
+
+**Parameters**:
+- `messages` (required): Array of message objects or strings to store as memory
+- `user_id` (optional): User identifier for scoping memories (defaults to Cursor IDE user)
+- `metadata` (optional): Additional metadata (tags, categories, importance, etc.)
+
+**Example Usage**:
+```json
+{
+  "messages": [
+    {"role": "user", "content": "I prefer using TypeScript with strict mode enabled"},
+    {"role": "assistant", "content": "User prefers TypeScript with strict mode for type safety"}
+  ],
+  "user_id": "id_cursor_ide_multi_client_session_user",
+  "metadata": {
+    "category": "coding_preferences",
+    "importance": "high",
+    "tags": ["typescript", "strict-mode"]
+  }
+}
+```
+
+### 2. `mem0_search` - Find Relevant Memories
+**Purpose**: Search through stored memories using semantic similarity.
+
+**When to use**:
+- Before starting a new task, search for relevant past context
+- When user asks about previous conversations or decisions
+- To find similar problems or solutions from the past
+- To recall user preferences for current task
+
+**Parameters**:
+- `query` (required): Search query describing what you're looking for
+- `user_id` (optional): User identifier to scope the search (defaults to Cursor IDE user)
+- `limit` (optional): Maximum number of results (default: 10, max: 100)
+
+**Example Usage**:
+```json
+{
+  "query": "TypeScript configuration preferences",
+  "user_id": "id_cursor_ide_multi_client_session_user",
+  "limit": 5
+}
+```
+
+### 3. `mem0_get_all` - Retrieve All Memories
+**Purpose**: Get all memories for a specific user.
+
+**When to use**:
+- User asks for a summary of what you remember about them
+- Starting a new session and want to load full context
+- Debugging memory storage issues
+
+**Parameters**:
+- `user_id` (optional): User identifier (defaults to Cursor IDE user)
+- `limit` (optional): Maximum number of memories (default: 50, max: 1000)
+
+### 4. `mem0_delete` - Remove Specific Memory
+**Purpose**: Delete a specific memory by its ID.
+
+**When to use**:
+- User asks to forget something specific
+- Correcting outdated or incorrect information
+- Managing memory storage limits
+
+**Parameters**:
+- `memory_id` (required): Unique identifier of the memory to delete
+
+### 5. `mem0_update` - Modify Existing Memory
+**Purpose**: Update the content of an existing memory.
+
+**When to use**:
+- User corrects previous information
+- Updating preferences or requirements
+- Refining stored context with new details
+
+**Parameters**:
+- `memory_id` (required): Unique identifier of the memory to update
+- `data` (required): New content for the memory
+
+### 6. `mem0_stats` - Get Memory Statistics
+**Purpose**: Get statistics about stored memories and server performance.
+
+**When to use**:
+- Debugging memory system issues
+- Understanding memory usage patterns
+- Performance monitoring
+
+**Parameters**:
+- `user_id` (optional): User identifier for user-specific stats (defaults to Cursor IDE user)
+
+## Technical Implementation
+
+### Server Architecture
+- **Type**: Direct Node.js MCP Server using `@modelcontextprotocol/sdk`
+- **Communication**: Subprocess calls to Python Mem0 server
+- **Transport**: STDIO (standard input/output)
+- **Database**: ChromaDB instances at `/home/celia/_installs/mcp-servers/mcp-memory/mem0/mem0_db/chroma_instances`
+- **Default User ID**: `id_cursor_ide_multi_client_session_user`
+
+### Configuration
+```json
+{
+  "mcpServers": {
+    "mem0": {
+      "command": "node",
+      "args": ["/home/celia/_installs/mcp-servers/mem0-mcp-direct.js"],
+      "disabled": false
+    }
+  }
+}
+```
+
+## Best Practices for Memory Management
+
+### 1. Proactive Memory Storage
+- **Always search first**: Before storing new memories, search to avoid duplicates
+- **Store immediately**: When user shares preferences or important context, store it right away
+- **Be specific**: Store detailed, actionable information rather than vague statements
+
+### 2. Effective Search Strategies
+- **Use semantic queries**: Search using natural language descriptions
+- **Search before major tasks**: Always check for relevant context before starting work
+- **Multiple search angles**: Try different query phrasings to find relevant memories
+
+### 3. Memory Organization
+- **Consistent user_id**: Use the same user identifier across all interactions
+- **Meaningful metadata**: Add categories, tags, and importance levels
+- **Regular cleanup**: Remove outdated or incorrect memories
+
+### 4. User Experience
+- **Transparent usage**: Inform users when you're storing or retrieving memories
+- **Allow control**: Let users manage their stored memories
+
+## Common Usage Patterns
+
+### Project Context Management
+```markdown
+1. Search for project-specific memories: "React project setup preferences"
+2. Store new project insights: Architecture decisions, coding patterns
+3. Remember debugging solutions: Error patterns and their fixes
+```
+
+### Coding Preferences
+```markdown
+1. Store: Language preferences, framework choices, coding standards
+2. Search: "preferred testing framework" or "code formatting rules"
+3. Update: When preferences change or evolve
+```
+
+### Learning and Development
+```markdown
+1. Store: New concepts learned, useful resources, best practices
+2. Search: "authentication patterns" or "database optimization techniques"
+3. Organize: Tag by technology, difficulty, or project type
+```
+
+## Error Handling
+- Always handle memory operation failures gracefully
+- Inform user if memory storage/retrieval fails
+- Continue with task even if memory operations fail
+- Log errors for debugging but don't expose technical details to users
+
+## Integration with Development Workflow
+
+### Code Generation
+1. **Search** for user's coding preferences and patterns
+2. **Apply** remembered styles and conventions
+3. **Store** new patterns or solutions discovered during development
+
+### Debugging
+1. **Search** for similar error patterns or solutions
+2. **Store** successful debugging approaches
+3. **Update** solutions with new insights
+
+### Project Setup
+1. **Search** for preferred project structures and configurations
+2. **Apply** remembered setup patterns
+3. **Store** new setup decisions for future reference
+
+## Example Workflow
+
+```markdown
+User: "I'm starting a new React project with TypeScript"
+
+Agent Actions:
+1. Search: "React TypeScript project setup preferences"
+2. Apply: Use remembered preferences for folder structure, linting, etc.
+3. Store: Any new decisions made during setup
+4. Inform: "I'm using your preferred TypeScript strict mode configuration"
+```
+
+## Memory Categories to Track
+
+- **`coding_preferences`**: Languages, frameworks, linting rules, code style
+- **`project_requirements`**: Tech stacks, architecture decisions, specific needs
+- **`debugging_solutions`**: Error fixes, troubleshooting approaches
+- **`learning_notes`**: New concepts, resources, best practices
+- **`workflow_patterns`**: Development processes, tool preferences
+
+## Essential Metadata Fields
+
+```json
+{
+  "category": "coding_preferences",
+  "tags": ["typescript", "react", "eslint"],
+  "importance": "high|medium|low",
+  "timestamp": "2025-05-27",
+  "project": "ecommerce" // if project-specific
+}
+```
+
+## Quick Examples
+
+### Store Preference
+```json
+{
+  "messages": [{"role": "user", "content": "I prefer TypeScript strict mode"}],
+  "user_id": "id_cursor_ide_multi_client_session_user",
+  "metadata": {"category": "coding_preferences", "tags": ["typescript"]}
+}
+```
+
+### Search Context
+```json
+{
+  "query": "React TypeScript setup preferences",
+  "user_id": "id_cursor_ide_multi_client_session_user",
+  "limit": 5
+}
+```
+
+## Best Practices Summary
+
+✅ **DO:**
+- Search before storing to avoid duplicates
+- Use consistent `user_id` across sessions
+- Store specific, actionable information
+- Handle failures gracefully
+
+❌ **DON'T:**
+- Store sensitive data (passwords, API keys)
+- Expose technical errors to users
+- Store vague or non-actionable information
+- Forget to add relevant metadata
+
+## User Experience Tips
+
+- **Be Transparent**: "Based on your preferred TypeScript configuration..."
+- **Be Proactive**: Search for context before major tasks
+- **Be Helpful**: Apply remembered preferences automatically
+- **Be Respectful**: Allow users to control their memories
+
+Remember: The mem0 system is designed to make interactions more personalized and efficient by maintaining context across sessions. Use it proactively to enhance the user experience.

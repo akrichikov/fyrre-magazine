@@ -1,0 +1,152 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# NextJS MCP Instructions for Cursor AI Agents
+
+## Overview
+You have access to a **NextJS TypeScript-Based MCP Server** that provides comprehensive Next.js project analysis and development assistance. This server offers professional-grade route analysis, configuration inspection, and component structure understanding with TypeScript-level sophistication.
+
+## Available Tools
+
+### 1. `get_routers_info` - Professional Route Analysis
+**Purpose**: Analyze Next.js routes with detailed API understanding including HTTP methods, parameters, schemas, and status codes.
+
+**When to use**:
+- User asks about API routes or project structure
+- Need to understand routing patterns (App Router vs Pages Router)
+- Exploring available endpoints and their implementations
+- Understanding project architecture and API design
+- Planning new features or modifications
+- Debugging route-related issues
+
+**Parameters**:
+- `projectDir` (required): Absolute path to Next.js project (e.g., `/home/celia/advisium.ai`)
+
+**Advanced Capabilities**:
+- **HTTP Method Detection**: Identifies GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
+- **Function Signature Analysis**: Extracts actual route handler implementations
+- **Parameter Extraction**: Identifies route parameters and their TypeScript types
+- **Status Code Detection**: Finds possible HTTP status codes (200, 201, 400, 404, 500, etc.)
+- **Schema Analysis**: Extracts Zod validation schemas and request/response types
+- **Import Analysis**: Lists all imports used in route files
+- **Comment Parsing**: Extracts descriptions from code comments
+
+**Example Output**:
+```json
+{
+  "success": true,
+  "routes": [
+    {
+      "filePath": "/home/celia/advisium.ai/app/api/users/route.ts",
+      "apiPath": "/api/users",
+      "handlers": [
+        {
+          "method": "GET",
+          "path": "/api/users",
+          "functionSignature": "export async function GET(request: Request)",
+          "description": "Get all users",
+          "parameters": [{"name": "request", "type": "Request", "required": true}],
+          "statusCodes": [{"code": 200, "description": "OK"}],
+          "responseType": "application/json"
+        }
+      ],
+      "imports": ["import { NextRequest, NextResponse } from 'next/server'"],
+      "validationSchemas": ["UserSchema"]
+    }
+  ],
+  "totalRoutes": 1,
+  "timestamp": "2024-05-28T17:30:00.000Z"
+}
+```
+
+### 2. `get_nextjs_config` - Configuration Analysis
+**Purpose**: Get Next.js configuration files and TypeScript settings including next.config.js, tsconfig.json, and package.json analysis.
+
+**When to use**:
+- User asks about project configuration
+- Need to understand build settings or dependencies
+- Troubleshooting configuration issues
+- Planning upgrades or migrations
+- Understanding project setup and tooling
+
+**Parameters**:
+- `projectDir` (required): Absolute path to Next.js project
+
+**Analyzes**:
+- **next.config.js**: Build configuration, plugins, experimental features
+- **tsconfig.json**: TypeScript configuration and compiler options
+- **package.json**: Dependencies, scripts, Next.js version
+
+### 3. `analyze_components` - Component Structure Analysis
+**Purpose**: Analyze Next.js components directory structure and organization patterns.
+
+**When to use**:
+- User asks about component organization
+- Need to understand project structure
+- Planning component refactoring
+- Understanding architectural patterns
+
+**Parameters**:
+- `projectDir` (required): Absolute path to Next.js project
+
+**Detects**:
+- Common component directories (`components`, `app`, `src/components`, `src/app`)
+- Directory existence and organization patterns
+- Project structure analysis
+
+## Best Practices
+
+### Proactive Analysis
+1. **Route Discovery**: Use `get_routers_info` when user mentions APIs or routes
+2. **Configuration Check**: Use `get_nextjs_config` for setup or build issues
+3. **Structure Understanding**: Use `analyze_components` for architectural questions
+
+### Context Application
+- Always provide the full absolute path to the Next.js project
+- Combine multiple tools for comprehensive project understanding
+- Use route analysis results to suggest improvements or identify issues
+
+### Error Handling
+- The server provides detailed error messages and success indicators
+- Check the `success` field in responses
+- Use timestamp information for debugging
+
+## Technical Advantages
+
+### TypeScript-Level Analysis
+- **Zod Schema Validation**: Type-safe input validation for all operations
+- **Professional Error Handling**: Comprehensive error management with detailed messages
+- **Advanced Parsing**: Understands TypeScript/JavaScript syntax and patterns
+
+### Route Analysis Features
+- **Function Body Analysis**: Examines actual implementation code
+- **Schema Detection**: Finds validation schemas and data structures
+- **Status Code Mapping**: Maps HTTP status codes to their meanings
+- **Import Tracking**: Understands dependencies and module usage
+
+### Performance Optimizations
+- **Selective Scanning**: Only scans relevant directories (skips node_modules, .git, etc.)
+- **App Router Focus**: Specifically targets App Router structure
+- **Efficient Parsing**: Uses regex patterns for fast code analysis
+
+## Integration with Cursor IDE
+
+This server is specifically designed for Cursor IDE integration and provides:
+- **Immediate Feedback**: Fast analysis for real-time development assistance
+- **Contextual Understanding**: Deep project comprehension for better AI assistance
+- **Development Workflow**: Supports common Next.js development patterns
+
+## Upgrade from Previous Implementation
+
+This TypeScript-based implementation provides significant improvements over the basic version:
+
+1. **3x More Tools**: Expanded from 1 to 3 comprehensive tools
+2. **Professional Analysis**: TypeScript-level understanding vs basic file scanning
+3. **Schema Validation**: Zod-based type safety for all inputs
+4. **Advanced Parsing**: Function signature analysis, status code detection
+5. **Better Error Handling**: Comprehensive error management
+6. **Configuration Analysis**: Deep understanding of Next.js setup
+
+Use this server for professional-grade Next.js project analysis and development assistance.
